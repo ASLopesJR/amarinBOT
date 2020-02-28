@@ -50,7 +50,7 @@ client.on('chat', (channel,user,message,self) => {
         let search = message.substring(7);
         var gamename = hltbService.search(search).then(result => result);
 
-        async function f1() {
+        async function Busca_zera() {
             var x = await gamename;
             //console.log(x); // 10
 
@@ -123,7 +123,7 @@ client.on('chat', (channel,user,message,self) => {
         }
 
 
-        f1();
+        Busca_zera();
     }
 
     if(message.substring(0,7) === "!falta "){
@@ -131,7 +131,7 @@ client.on('chat', (channel,user,message,self) => {
         let search = message.substring(8);
         var gamename = hltbService.search(search).then(result => result);
 
-        async function f1() {
+        async function Busca_falta() {
             var x = await gamename;
             //console.log(x); // 10
 
@@ -217,6 +217,6 @@ client.on('chat', (channel,user,message,self) => {
         }
 
 
-        f1();
+        Busca_falta();
     }
 });
