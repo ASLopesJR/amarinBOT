@@ -57,7 +57,7 @@ client.on('chat', (channel,user,message,self) => {
                 client.action(channel,"Confere esse nome de jogo aí que eu não achei no HowLongToBeat não...");
             }
             else{
-            client.action(channel, "Segundo HowLongToBeat, "x[0].name + " demora " + x[0].gameplayMain + " horas pra zerar.");
+            client.action(channel, "Segundo HowLongToBeat, "+x[0].name + " demora " + x[0].gameplayMain + " horas pra zerar.");
             }
         }
         Busca_zera();
