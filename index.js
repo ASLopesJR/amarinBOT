@@ -258,7 +258,7 @@ client.on('chat', (channel,user,message,self) => {
                     req.end(function (res) {
                         if (res.error) throw new Error(res.error);
 
-                        var mensagem = "Segundo isthereanydeal, " + x[0].name + " -> ";
+                        var mensagem = "Segundo IsThereAnyDeal, " + x[0].name + " -> ";
                         var pricelist =  res.body.data[nameitnd].list;
                         if (pricelist.length === 0){
                             mensagem = x[0].name + " ainda vende em algum lugar?";
