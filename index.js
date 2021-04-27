@@ -296,4 +296,10 @@ client.on('chat', (channel,user,message,self) => {
         Busca_preco();
     }
 
+    if(message.substring(0,9) === "!comandos"){
+            client.action(channel, "Os comandos disponíveis são: !zera -> Quanto tempo pra zerar segundo Howlongtobeat; !falta -> Quantas horas "+channel+" tem pra zerar antes da média do Howlongtobeat; !preço -> Verifica o preço de um jogo nas lojas; !source -> Diz onde está o código fonte do bot; !comandos -> é esse comando.");
+    }
+    if(message.substring(0,7) === "!source"){
+            client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/twitchbot.");
+    }
 });
