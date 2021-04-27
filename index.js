@@ -82,6 +82,7 @@ client.on('chat', (channel,user,message,self) => {
                 req.end(function (res) {
                     if (res.error) {
                         client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                        return;
                     }
                     var steamlist = res.body.applist.apps;
                     const searcher = new FuzzySearch(steamlist, ['appid','name'], {
@@ -116,6 +117,7 @@ client.on('chat', (channel,user,message,self) => {
                     req.end(function (res) {
                         if (res.error) {
                             client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                            return;
                         }
 
                         var flag = false;
@@ -198,6 +200,7 @@ client.on('chat', (channel,user,message,self) => {
                 req.end(function (res) {
                     if (res.error) {
                         client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                        return;
                     }
 
                     var nameitnd = res.body.data.plain;
@@ -206,6 +209,7 @@ client.on('chat', (channel,user,message,self) => {
                     req.end(function (res) {
                         if (res.error) {
                             client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                            return;
                         }
 
                         var mensagem = "Segundo IsThereAnyDeal, " + x[0].name + " -> ";
@@ -264,6 +268,7 @@ client.on('chat', (channel,user,message,self) => {
                 req.end(function (res) {
                     if (res.error) {
                         client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                        return;
                     }
 
                     var nameitnd = res.body.data.plain;
@@ -272,6 +277,7 @@ client.on('chat', (channel,user,message,self) => {
                     req.end(function (res) {
                         if (res.error) {
                             client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                            return;
                         }
 
                         var mensagem = "";
