@@ -14,10 +14,9 @@ let hltbService = new hltb.HowLongToBeatService();
 var unirest = require("unirest");
 var FuzzySearch = require('fuzzy-search');
 
-
 const username = process.env.username;
-const password = process.env.password
-const steamapi = process.env.steamapi
+const password = process.env.password;
+const steamapi = process.env.steamapi;
 const istheapi = process.env.istheapi;
 
 let options = {
