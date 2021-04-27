@@ -224,12 +224,13 @@ client.on('chat', (channel,user,message,self) => {
 
         let time_set = message.replace("!timer ", "");
         function set_timer(time_set) {
-            client.action(channel, "Acabou o timer!")
+            client.action(channel, "O tempo acabou!")
         }
         if (time_set > 600){
             client.action(channel, "Timer máximo de 10min");
         }
         else{
+            client.action(channel,"Definido um timer de "+time_set+" segundos");
             setTimeout(set_timer, time_set*1000);
         }
     }
@@ -297,7 +298,7 @@ client.on('chat', (channel,user,message,self) => {
     }
 
     if(message.substring(0,9) === "!comandos"){
-            client.action(channel, "Os comandos disponíveis são: !zera -> Quanto tempo pra zerar segundo Howlongtobeat; !falta -> Quantas horas "+channel+" tem pra zerar antes da média do Howlongtobeat; !preço -> Verifica o preço de um jogo nas lojas; !source -> Diz onde está o código fonte do bot; !comandos -> é esse comando.");
+            client.action(channel, "Os comandos disponíveis são: !zera <arg> -> Quanto tempo pra zerar segundo Howlongtobeat; !falta <arg> -> Quantas horas "+channel+" tem pra zerar antes da média do Howlongtobeat; !preço <arg> -> Verifica o preço de um jogo nas lojas; !source -> Diz onde está o código fonte do bot; !timer <arg> -> Cria um timer em segundos (máximo 10min); !comandos -> é esse comando.");
     }
     if(message.substring(0,7) === "!source"){
             client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/twitchbot.");
