@@ -62,69 +62,73 @@ client.on('chat', (channel,user,message,self) => {
                 var req = unirest("GET", "https://api.steampowered.com/ISteamApps/GetAppList/v2");
 
                 req.end(function (res) {
-                    if (res.error) throw new Error(res.error);
-                    var steamlist = res.body.applist.apps;
-                const searcher = new FuzzySearch(steamlist, ['appid','name'], {
-                    sort: true, caseSensitive: false,
-                });
-
-
-                const result = searcher.search(x[0].name);
-
-                if (typeof(result[0]) == 'undefined'){
-                    client.action(channel,"Confere esse nome de jogo aí que eu não achei no HLTB não... Muito menos se o " + channel + " tem.");
-                    return}
-                var value = result[0].appid;
-                for (var i = 1; i < result.length; i++) {
-                    if (result[i].appid < value) {
-                        value = result[i].appid;
+                    if (res.error) {
+                        client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                     }
-                }
-                if (channel === "#stockermann2"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198016861690&format=json");
-                }
-                if (channel === "#amarinlopes"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198012528808&format=json");
-                }
-                if (channel === "#salsatheone"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198006873223&format=json");
-                }
-                if (channel === "#sojogabruno"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198023712764&format=json");
-                }
-                if (channel === "#tv_trem"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198015228132&format=json");
-                }
+                    var steamlist = res.body.applist.apps;
+                    const searcher = new FuzzySearch(steamlist, ['appid','name'], {
+                        sort: true, caseSensitive: false,
+                    });
 
-                req.end(function (res) {
-                    if (res.error) throw new Error(res.error);
 
-                    var flag = false;
+                    const result = searcher.search(x[0].name);
 
-                    for(var i = 0; i < res.body.response.games.length;i++){
-                        if(res.body.response.games[i].appid === result[0].appid){
-
-                            var horas = Math.round(res.body.response.games[i].playtime_forever/60);
-                            client.action(channel,x[0].name + " demora " + x[0].gameplayMain + " horas e o " + channel + " já jogou umas " + horas + " horas até agora!");
-                            flag = true;
+                    if (typeof(result[0]) == 'undefined'){
+                        client.action(channel,"Confere esse nome de jogo aí que eu não achei no HLTB não... Muito menos se o " + channel + " tem.");
+                        return}
+                    var value = result[0].appid;
+                    for (var i = 1; i < result.length; i++) {
+                        if (result[i].appid < value) {
+                            value = result[i].appid;
                         }
                     }
-                    if (flag === false){
+                    if (channel === "#stockermann2"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198016861690&format=json");
+                    }
+                    if (channel === "#amarinlopes"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198012528808&format=json");
+                    }
+                    if (channel === "#salsatheone"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198006873223&format=json");
+                    }
+                    if (channel === "#sojogabruno"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198023712764&format=json");
+                    }
+                    if (channel === "#tv_trem"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198015228132&format=json");
+                    }
+
+                    req.end(function (res) {
+                        if (res.error) {
+                            client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                        }
+
+                        var flag = false;
+
                         for(var i = 0; i < res.body.response.games.length;i++){
-                            if(res.body.response.games[i].appid === value){
+                            if(res.body.response.games[i].appid === result[0].appid){
 
                                 var horas = Math.round(res.body.response.games[i].playtime_forever/60);
-                                client.action(channel,x[0].name + " demora " + x[0].gameplayMain + " horas e o " + channel +" já jogou umas " + horas + " horas até agora!");
+                                client.action(channel,x[0].name + " demora " + x[0].gameplayMain + " horas e o " + channel + " já jogou umas " + horas + " horas até agora!");
                                 flag = true;
                             }
                         }
-                    }
-                    if (flag === false){
-                        client.action(channel, x[0].name + " demora " + x[0].gameplayMain + " horas mas não achei na Steam do " + channel + " não...");
-                    }
+                        if (flag === false){
+                            for(var i = 0; i < res.body.response.games.length;i++){
+                                if(res.body.response.games[i].appid === value){
+
+                                    var horas = Math.round(res.body.response.games[i].playtime_forever/60);
+                                    client.action(channel,x[0].name + " demora " + x[0].gameplayMain + " horas e o " + channel +" já jogou umas " + horas + " horas até agora!");
+                                    flag = true;
+                                }
+                            }
+                        }
+                        if (flag === false){
+                            client.action(channel, x[0].name + " demora " + x[0].gameplayMain + " horas mas não achei na Steam do " + channel + " não...");
+                        }
 
 
-                });
+                    });
 
                 });
             }
@@ -151,60 +155,49 @@ client.on('chat', (channel,user,message,self) => {
                 var req = unirest("GET", "https://api.steampowered.com/ISteamApps/GetAppList/v2");
 
                 req.end(function (res) {
-                    if (res.error) throw new Error(res.error);
-                    var steamlist = res.body.applist.apps;
-                const searcher = new FuzzySearch(steamlist, ['appid','name'], {
-                    sort: true, caseSensitive: false,
-                });
-
-
-                const result = searcher.search(x[0].name);
-
-                var value = result[0].appid;
-                for (var i = 1; i < result.length; i++) {
-                    if (result[i].appid < value) {
-                        value = result[i].appid;
+                    if (res.error) {
+                        client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                     }
-                }
-                if (channel === "#stockermann2"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198016861690&format=json");
-                }
-                if (channel === "#amarinlopes"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198012528808&format=json");
-                }
-                if (channel === "#salsatheone"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198006873223&format=json");
-                }
-                if (channel === "#sojogabruno"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198023712764&format=json");
-                }
-                if (channel === "#tv_trem"){
-                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198015228132&format=json");
-                }
+                    var steamlist = res.body.applist.apps;
+                    const searcher = new FuzzySearch(steamlist, ['appid','name'], {
+                        sort: true, caseSensitive: false,
+                    });
 
-                req.end(function (res) {
-                    if (res.error) throw new Error(res.error);
 
-                    var flag = false;
+                    const result = searcher.search(x[0].name);
 
-                    for(var i = 0; i < res.body.response.games.length;i++){
-                        if(res.body.response.games[i].appid === result[0].appid){
-
-                            var horas = Math.round(res.body.response.games[i].playtime_forever/60);
-                            var resta = x[0].gameplayMain - horas;
-                            if(resta <= 0){
-                                client.action(channel,"O " + channel + " está atrasado " + resta + " horas pra zerar o " + x[0].name + ". Isso se ele não tá de sacanagem e já zerou.");
-                                flag = true;
-                            }
-                            else{
-                                client.action(channel,"O " + channel + " ainda tem " + resta + " horas pra zerar o " + x[0].name + ". Vai que dá!");
-                                flag = true;
-                            }
+                    var value = result[0].appid;
+                    for (var i = 1; i < result.length; i++) {
+                        if (result[i].appid < value) {
+                            value = result[i].appid;
                         }
                     }
-                    if (flag === false){
+                    if (channel === "#stockermann2"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198016861690&format=json");
+                    }
+                    if (channel === "#amarinlopes"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198012528808&format=json");
+                    }
+                    if (channel === "#salsatheone"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198006873223&format=json");
+                    }
+                    if (channel === "#sojogabruno"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198023712764&format=json");
+                    }
+                    if (channel === "#tv_trem"){
+                        var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198015228132&format=json");
+                    }
+
+                    req.end(function (res) {
+                        if (res.error) {
+                            client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                        }
+
+                        var flag = false;
+
                         for(var i = 0; i < res.body.response.games.length;i++){
-                            if(res.body.response.games[i].appid === value){
+                            if(res.body.response.games[i].appid === result[0].appid){
+
                                 var horas = Math.round(res.body.response.games[i].playtime_forever/60);
                                 var resta = x[0].gameplayMain - horas;
                                 if(resta <= 0){
@@ -217,13 +210,28 @@ client.on('chat', (channel,user,message,self) => {
                                 }
                             }
                         }
-                    }
-                    if (flag === false){
-                        client.action(channel, x[0].name + " tá na steam do " + channel + "? Não achei aqui não...");
-                    }
+                        if (flag === false){
+                            for(var i = 0; i < res.body.response.games.length;i++){
+                                if(res.body.response.games[i].appid === value){
+                                    var horas = Math.round(res.body.response.games[i].playtime_forever/60);
+                                    var resta = x[0].gameplayMain - horas;
+                                    if(resta <= 0){
+                                        client.action(channel,"O " + channel + " está atrasado " + resta + " horas pra zerar o " + x[0].name + ". Isso se ele não tá de sacanagem e já zerou.");
+                                        flag = true;
+                                    }
+                                    else{
+                                        client.action(channel,"O " + channel + " ainda tem " + resta + " horas pra zerar o " + x[0].name + ". Vai que dá!");
+                                        flag = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (flag === false){
+                            client.action(channel, x[0].name + " tá na steam do " + channel + "? Não achei aqui não...");
+                        }
 
 
-                });
+                    });
 
                 });
             }
@@ -263,13 +271,17 @@ client.on('chat', (channel,user,message,self) => {
                 var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+x[0].name+"&optional=");
 
                 req.end(function (res) {
-                    if (res.error) throw new Error(res.error);
+                    if (res.error) {
+                        client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                    }
 
                     var nameitnd = res.body.data.plain;
                     var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/prices/?key="+istheapi+"&plains="+ nameitnd +"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&added=0");
 
                     req.end(function (res) {
-                        if (res.error) throw new Error(res.error);
+                        if (res.error) {
+                            client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                        }
 
                         var mensagem = "Segundo IsThereAnyDeal, " + x[0].name + " -> ";
                         var pricelist =  res.body.data[nameitnd].list;
@@ -310,9 +322,9 @@ client.on('chat', (channel,user,message,self) => {
     }
 
     if(message.substring(0,9) === "!comandos"){
-            client.action(channel, "Os comandos disponíveis são: !zera <arg> -> Quanto tempo pra zerar segundo Howlongtobeat; !falta <arg> -> Quantas horas "+channel+" tem pra zerar antes da média do Howlongtobeat; !preço <arg> -> Verifica o preço de um jogo nas lojas; !source -> Diz onde está o código fonte do bot; !timer <arg> -> Cria um timer em segundos (máximo 10min); !comandos -> é esse comando.");
+        client.action(channel, "Os comandos disponíveis são: !zera <arg> -> Quanto tempo pra zerar segundo Howlongtobeat; !falta <arg> -> Quantas horas "+channel+" tem pra zerar antes da média do Howlongtobeat; !preço <arg> -> Verifica o preço de um jogo nas lojas; !source -> Diz onde está o código fonte do bot; !timer <arg> -> Cria um timer em segundos (máximo 10min); !comandos -> é esse comando.");
     }
     if(message.substring(0,7) === "!source"){
-            client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/twitchbot.");
+        client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/twitchbot.");
     }
 });
