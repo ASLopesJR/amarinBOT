@@ -31,7 +31,7 @@ let options = {
         username: username ,
         password: password
     },
-    channels: [ "stockermann2", "amarinlopes" , "salsatheone"]
+    channels: [ "stockermann2", "amarinlopes" , "salsatheone", "sojogabruno", "tv_trem"]
 };
 
 let client = new tmi.client(options);
@@ -88,6 +88,12 @@ client.on('chat', (channel,user,message,self) => {
                 }
                 if (channel === "#salsatheone"){
                     var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198006873223&format=json");
+                }
+                if (channel === "#sojogabruno"){
+                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198023712764&format=json");
+                }
+                if (channel === "#tv_trem"){
+                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198015228132&format=json");
                 }
 
                 req.end(function (res) {
@@ -168,6 +174,12 @@ client.on('chat', (channel,user,message,self) => {
                 }
                 if (channel === "#salsatheone"){
                     var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198006873223&format=json");
+                }
+                if (channel === "#sojogabruno"){
+                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198023712764&format=json");
+                }
+                if (channel === "#tv_trem"){
+                    var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid=76561198015228132&format=json");
                 }
 
                 req.end(function (res) {
