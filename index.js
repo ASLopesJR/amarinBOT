@@ -8,15 +8,16 @@
 
 
 const tmi = require("tmi.js");
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();
 let hltb = require('howlongtobeat');
 let hltbService = new hltb.HowLongToBeatService();
 var unirest = require("unirest");
 var FuzzySearch = require('fuzzy-search');
 
+
 const username = process.env.username;
-const password = process.env.password;
-const steamapi = process.env.steamapi;
+const password = process.env.password
+const steamapi = process.env.steamapi
 const istheapi = process.env.istheapi;
 
 let options = {
@@ -258,7 +259,7 @@ client.on('chat', (channel,user,message,self) => {
                     req.end(function (res) {
                         if (res.error) throw new Error(res.error);
 
-                        var mensagem = "Segundo IsThereAnyDeal, " + x[0].name + " -> ";
+                        var mensagem = "Segundo isthereanydeal, " + x[0].name + " -> ";
                         var pricelist =  res.body.data[nameitnd].list;
                         if (pricelist.length === 0){
                             mensagem = x[0].name + " ainda vende em algum lugar?";
