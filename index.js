@@ -57,7 +57,7 @@ client.on('chat', (channel,user,message,self) => {
                 client.action(channel,"Confere esse nome de jogo aí que eu não achei no HowLongToBeat não...");
             }
             else{
-            client.action(channel, x[0].name + " demora " + x[0].gameplayMain + " horas pra zerar.");
+            client.action(channel, "Segundo HowLongToBeat, "x[0].name + " demora " + x[0].gameplayMain + " horas pra zerar.");
             }
         }
         Busca_zera();
@@ -128,6 +128,7 @@ client.on('chat', (channel,user,message,self) => {
                                 var horas = Math.round(res.body.response.games[i].playtime_forever/60);
                                 var resta = x[0].gameplayMain - horas;
                                 if(resta <= 0){
+                                    resta = - resta;
                                     client.action(channel,"O " + channel + " está atrasado " + resta + " horas pra zerar o " + x[0].name + ". Isso se ele não tá de sacanagem e já zerou.");
                                     flag = true;
                                 }
@@ -143,6 +144,7 @@ client.on('chat', (channel,user,message,self) => {
                                     var horas = Math.round(res.body.response.games[i].playtime_forever/60);
                                     var resta = x[0].gameplayMain - horas;
                                     if(resta <= 0){
+                                        resta = - resta;
                                         client.action(channel,"O " + channel + " está atrasado " + resta + " horas pra zerar o " + x[0].name + ". Isso se ele não tá de sacanagem e já zerou.");
                                         flag = true;
                                     }
