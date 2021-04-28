@@ -57,7 +57,7 @@ client.on('chat', (channel,user,message,self) => {
                 client.action(channel,"Confere esse nome de jogo aí que eu não achei no HowLongToBeat não...");
             }
             else{
-            client.action(channel, "Segundo HowLongToBeat, "+x[0].name + " demora " + x[0].gameplayMain + " horas pra zerar.");
+                client.action(channel, "Segundo HowLongToBeat, "+x[0].name + " demora " + x[0].gameplayMain + " horas pra zerar.");
             }
         }
         Busca_zera();
@@ -187,17 +187,22 @@ client.on('chat', (channel,user,message,self) => {
 
     if(message.substring(0,7) === "!preço "){
 
-        let search = message.substring(8);
+        let search = message.substring(7);
         var gamename = hltbService.search(search).then(result => result);
 
         async function Busca_preco() {
-            var x = await gamename;
+            var busca_preco = await search;
 
-            if (Object.keys(x).length === 0){
-                client.action(channel,"Confere esse nome de jogo aí.");
-            }
-            else{
-                var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+x[0].name+"&optional=");
+            var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+busca_preco+"&optional=");
+
+            req.end(function (res) {
+                if (res.error) {
+                    client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                    return;
+                }
+
+                var nameitnd = res.body.data.plain;
+                var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/prices/?key="+istheapi+"&plains="+ nameitnd +"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&added=0");
 
                 req.end(function (res) {
                     if (res.error) {
@@ -205,49 +210,39 @@ client.on('chat', (channel,user,message,self) => {
                         return;
                     }
 
-                    var nameitnd = res.body.data.plain;
-                    var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/prices/?key="+istheapi+"&plains="+ nameitnd +"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&added=0");
-
-                    req.end(function (res) {
-                        if (res.error) {
-                            client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
-                            return;
-                        }
-
-                        var mensagem = "Segundo IsThereAnyDeal, " + x[0].name + " -> ";
-                        var pricelist =  res.body.data[nameitnd].list;
-                        if (pricelist.length === 0){
-                            mensagem = x[0].name + " ainda vende em algum lugar?";
-                        }
-                        else{
-                            for (var i = 0; i < pricelist.length; i++) {
-                                if( i === 0){
-                                    if (pricelist[i].price_cut === 0){
-                                        mensagem = mensagem + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new;
-                                    }
-                                    else{
-                                        mensagem = mensagem + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new;
-                                    }
-
+                    var mensagem = user.username +" Segundo IsThereAnyDeal -> ";
+                    var pricelist =  res.body.data[nameitnd].list;
+                    if (pricelist.length === 0){
+                        mensagem = user.username + "Seu jogo ainda vende em algum lugar?";
+                    }
+                    else{
+                        for (var i = 0; i < pricelist.length; i++) {
+                            if( i === 0){
+                                if (pricelist[i].price_cut === 0){
+                                    mensagem = mensagem + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new;
                                 }
                                 else{
-                                    if (pricelist[i].price_cut === 0){
-                                        mensagem = mensagem + ", " + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new ;
-                                    }
-                                    else{
-                                        mensagem = mensagem + ", " + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new ;
-                                    }
+                                    mensagem = mensagem + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new;
+                                }
+
+                            }
+                            else{
+                                if (pricelist[i].price_cut === 0){
+                                    mensagem = mensagem + ", " + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new ;
+                                }
+                                else{
+                                    mensagem = mensagem + ", " + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new ;
                                 }
                             }
                         }
+                    }
 
-                        client.action(channel, mensagem);
-
-                    });
+                    client.action(channel, mensagem);
 
                 });
 
-            }
+            });
+
         }
         Busca_preco();
     }
@@ -255,17 +250,20 @@ client.on('chat', (channel,user,message,self) => {
 
     if(message.substring(0,9) === "!histlow "){
 
-        let search = message.substring(10);
-        var gamename = hltbService.search(search).then(result => result);
+        let search = message.substring(9);
 
         async function Busca_histo() {
-            var x = await gamename;
+            var busca_hist = await search;
+            var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+busca_hist+"&optional=");
 
-            if (Object.keys(x).length === 0){
-                client.action(channel,"Confere esse nome de jogo aí.");
-            }
-            else{
-                var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+x[0].name+"&optional=");
+            req.end(function (res) {
+                if (res.error) {
+                    client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                    return;
+                }
+
+                var nameitnd = res.body.data.plain;
+                var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/lowest/?key="+istheapi+"&plains="+nameitnd+"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&since=0");
 
                 req.end(function (res) {
                     if (res.error) {
@@ -273,31 +271,21 @@ client.on('chat', (channel,user,message,self) => {
                         return;
                     }
 
-                    var nameitnd = res.body.data.plain;
-                    var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/lowest/?key="+istheapi+"&plains="+nameitnd+"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&since=0");
+                    var mensagem = "";
+                    var pricelist =  res.body.data[nameitnd];
+                    if (pricelist.length === 0){
+                        mensagem = user.username + ", seu jogo ainda vende em algum lugar?";
+                    }
+                    else{
+                        mensagem = user.username + ", Segundo IsThereAnyDeal, o menor preço foi R$" +pricelist.price+ " com "+pricelist.cut+"% de desconto em "+pricelist.shop.name+".";
+                    }
 
-                    req.end(function (res) {
-                        if (res.error) {
-                            client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
-                            return;
-                        }
-
-                        var mensagem = "";
-                        var pricelist =  res.body.data[nameitnd];
-                        if (pricelist.length === 0){
-                            mensagem = x[0].name + " ainda vende em algum lugar?";
-                        }
-                        else{
-                            mensagem = "Segundo IsThereAnyDeal, o menor preço de "+x[0].name+" foi R$" +pricelist.price+ " com "+pricelist.cut+"% de desconto em "+pricelist.shop.name+".";
-                        }
-
-                        client.action(channel, mensagem);
-
-                    });
+                    client.action(channel, mensagem);
 
                 });
 
-            }
+            });
+
         }
         Busca_histo();
     }
