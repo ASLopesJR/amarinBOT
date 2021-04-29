@@ -2,15 +2,12 @@
  * TODO:
  * implementar busca google
  */
-
 const channel_info = require("./channels.json");
 var cache = require('memory-cache');
 const tmi = require("tmi.js");
 const dotenv = require('dotenv').config();
 const schedule = require('node-schedule')
-
 let hltb = require('howlongtobeat');
-let hltbService = new hltb.HowLongToBeatService();
 var unirest = require("unirest");
 var FuzzySearch = require('fuzzy-search');
 
@@ -19,11 +16,8 @@ const password = process.env.password;
 const steamapi = process.env.steamapi;
 const istheapi = process.env.istheapi;
 
-
 function UpdateCache() {
-
     var req = unirest("GET", "https://api.steampowered.com/ISteamApps/GetAppList/v2");
-
     req.end(function (res) {
         if (res.error) {
             return;
@@ -40,7 +34,6 @@ function get_runners_names(channel, user, category_name, time_run, playertype,ke
     else{
         if(playertype[key] === 'user'){
             var req = unirest("get", player_uri[key]);
-
             req.end(function (res) {
                 if (res.error) {
                     return;
@@ -60,58 +53,26 @@ function get_runners_names(channel, user, category_name, time_run, playertype,ke
 function dehash(channel) {
     return channel.replace(/^#/, '');
 }
-
-UpdateCache();
-
-schedule.scheduleJob('0 0 * * *', () => {
-    UpdateCache();
-}) // run everyday at midnight
-
-let tmi_options = {
-    options: {
-        debug: true
-    },
-    connection: {
-        reconnect: true,
-        secure: true
-    },
-    identity: {
-        username: username ,
-        password: password
-    },
-    channels: Object.keys(channel_info)
-};
-
-let client = new tmi.client(tmi_options);
-
-client.log.setLevel('warn');
-
 function handle_chat_commands(channel, user, message, self){
     var sepmsg  = message.split(' ');
     var comando = sepmsg[0];
     var args    = sepmsg.slice(1).join(' ');
-
     switch(comando){
         case "!preço":{
             let busca_preco = args;
-
             var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+busca_preco+"&optional=");
-
             req.end(function (res) {
                 if (res.error) {
                     client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                     return;
                 }
-
                 var nameitnd = res.body.data.plain;
                 var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/prices/?key="+istheapi+"&plains="+ nameitnd +"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&added=0");
-
                 req.end(function (res) {
                     if (res.error) {
                         client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                         return;
                     }
-
                     var mensagem = user.username +" Segundo IsThereAnyDeal -> ";
                     var pricelist =  res.body.data[nameitnd].list;
                     if (pricelist.length === 0){
@@ -126,7 +87,6 @@ function handle_chat_commands(channel, user, message, self){
                                 else{
                                     mensagem = mensagem + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new;
                                 }
-
                             }
                             else{
                                 if (pricelist[i].price_cut === 0){
@@ -141,13 +101,11 @@ function handle_chat_commands(channel, user, message, self){
                     client.action(channel, mensagem);
                 });
             });
-
             break;
         }
         case "!zera":{
             let search = args;
             hltbService.search(search).then(result => {
-
                 if (Object.keys(result).length === 0){
                     client.action(channel,"Confere esse nome de jogo aí que eu não achei no HowLongToBeat não...");
                 }
@@ -155,25 +113,19 @@ function handle_chat_commands(channel, user, message, self){
                     client.action(channel, "Segundo HowLongToBeat, "+result[0].name + " demora " + result[0].gameplayMain + " horas pra zerar.");
                 }
             });
-
             break;
         }
         case "!falta": {
-
             let search = args;
             hltbService.search(search).then(result => {
-
                 if (Object.keys(result).length === 0){
                     client.action(channel,"Confere esse nome de jogo aí que eu não achei no HLTB não.");
                 }
                 else{
-
                     const searcher = new FuzzySearch(cache.get('steamlist'), ['appid','name'], {
                         sort: true, caseSensitive: false,
                     });
-
                     const searchresult = searcher.search(result[0].name);
-
                     if (searchresult.length === 0){
                         client.action(channel, "Não achei o jogo na Steam.");
                         return;
@@ -185,22 +137,18 @@ function handle_chat_commands(channel, user, message, self){
                         }
                     }
                     var channelname = dehash(channel);
-
                     var req = unirest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamapi + "&steamid="+channel_info[channelname].steamid+"&format=json");
-
                     req.end(function (res) {
                         if (res.error) {
                             client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                             return;
                         }
-
                         var gameowned = res.body.response.games.filter(function(game) {
                             return game.appid == searchresult[0].appid;
                         });
                         var outrogameowned = res.body.response.games.filter(function(game) {
                             return game.appid == value;
                         });
-
                         if(Object.keys(gameowned).length > 0){
                             var horas = Math.round(gameowned.playtime_forever/60);
                             var resta = result[0].gameplayMain - horas;
@@ -227,14 +175,11 @@ function handle_chat_commands(channel, user, message, self){
                             client.action(channel, result[0].name + " tá na steam do " + channelname + "? Não achei aqui não...");
                         }
                     });
-
                 }
             });
-
             break;
         }
         case "!timer":{
-
             let time_set = args;
             function set_timer(time_set) {
                 client.action(channel, "O tempo acabou!")
@@ -249,25 +194,20 @@ function handle_chat_commands(channel, user, message, self){
             break;
         }
         case "!histlow":{
-
             var busca_hist = args;
             var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+busca_hist+"&optional=");
-
             req.end(function (res) {
                 if (res.error) {
                     client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                     return;
                 }
-
                 var nameitnd = res.body.data.plain;
                 var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/lowest/?key="+istheapi+"&plains="+nameitnd+"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&since=0");
-
                 req.end(function (res) {
                     if (res.error) {
                         client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                         return;
                     }
-
                     var mensagem = "";
                     var pricelist =  res.body.data[nameitnd];
                     if (pricelist.length === 0){
@@ -276,13 +216,9 @@ function handle_chat_commands(channel, user, message, self){
                     else{
                         mensagem = user.username + ", Segundo IsThereAnyDeal, o menor preço foi R$" +pricelist.price+ " com "+pricelist.cut+"% de desconto em "+pricelist.shop.name+".";
                     }
-
                     client.action(channel, mensagem);
-
                 });
-
             });
-
             break;
         }
         case "!comandos":{
@@ -294,15 +230,11 @@ function handle_chat_commands(channel, user, message, self){
             break;
         }
         case "!speedrun":{
-
             var req = unirest("GET", "https://www.speedrun.com/api/v1/games?name="+args+"&max=1");
-
             req.end(function (res) {
                 if (res.error) {
                     return;
                 }
-
-
                 if (Object.keys(res.body.data).length === 0){
                     client.action(channel,"Não encontrei esse jogo no site Speedrun, verifique o nome e tente novamente. Ou desista.");
                     return;
@@ -310,16 +242,14 @@ function handle_chat_commands(channel, user, message, self){
                 var gamename = res.body.data[0].names.international;
                 var game_run_id = res.body.data[0].links[5];
                 var req = unirest("GET", game_run_id.uri+"?miscellaneous=no&scope=full-game");
-
                 req.end(function (res) {
                     if (res.error) {
                         return;
                     }
-
                     game_runs = res.body.data[0];
+                    category_id = game_runs.category;
                     const time_run = game_runs.runs[0].run.times.primary.slice(2).toLowerCase();
-                    const category_name = game_runs.weblink.split('#').slice(1).join('_').replaceAll('_',' ');
-
+                    var category_name = game_runs.weblink.split('#').slice(1).join('_').replaceAll('_',' ');
                     var player_count = Object.keys(game_runs.runs[0].run.players).length
                     var players = new Array(player_count);
                     var playertype = new Array(player_count);
@@ -331,19 +261,53 @@ function handle_chat_commands(channel, user, message, self){
                         player_ids[key] = game_runs.runs[0].run.players[key].id;
                     }
                     var key = 0;
-
-                    get_runners_names(channel, user, category_name, time_run, playertype,key,player_count,player_uri,players,player_ids,gamename);
-
+                    var req = unirest("GET", "https://www.speedrun.com/api/v1/categories/"+category_id+"/variables");
+                    req.end(function (res) {
+                        if (res.error) {
+                            return;
+                        }
+                        if (Object.keys(res.body.data).length === 0){
+                            get_runners_names(channel, user, category_name, time_run, playertype,key,player_count,player_uri,players,player_ids,gamename);
+                        }
+                        else{
+                            var run_variable = res.body.data[0].values.values;
+                            run_variable = run_variable[Object.keys(run_variable)[0]].label;
+                            category_name = category_name.concat(" - ", run_variable);
+                            get_runners_names(channel, user, category_name, time_run, playertype,key,player_count,player_uri,players,player_ids,gamename);
+                        }
+                    });
                 });
             });
-
-
             break;
         }
         default:{}
     }
 };
 
+schedule.scheduleJob('0 0 * * *', () => {
+    UpdateCache();
+}) // run everyday at midnight
+
+let tmi_options = {
+    options: {
+        debug: true
+    },
+    connection: {
+        reconnect: true,
+        secure: true
+    },
+    identity: {
+        username: username ,
+        password: password
+    },
+    channels: Object.keys(channel_info)
+};
+
+let hltbService = new hltb.HowLongToBeatService();
+let client = new tmi.client(tmi_options);
+
+client.log.setLevel('warn');
 client.addListener('message',handle_chat_commands);
 
+UpdateCache();
 client.connect();
