@@ -31,8 +31,31 @@ function UpdateCache() {
         cache.put('steamlist',res.body.applist.apps);
     });
 }
-function FindGame(game,result) {
-    return game.appid === result;
+function get_runners_names(channel, user, category_name, time_run, playertype,key, player_count,player_uri, players,player_ids,gamename){
+    // Isso é completamente amaldiçoado, mas a api me forçou a fazer isso
+    if(key >= player_count){
+        players = players.join(' e ');
+        client.action(channel, user.username + " O jogo "+gamename+" na categoria principal (" + category_name + ") o record é de "+ time_run + " por " +players)
+    }
+    else{
+        if(playertype[key] === 'user'){
+            var req = unirest("get", player_uri[key]);
+
+            req.end(function (res) {
+                if (res.error) {
+                    return;
+                }
+                players[key] = res.body.data.names.international;
+                key = key + 1;
+                get_runners_names(channel, user, category_name, time_run, playertype,key,player_count,player_uri,players,player_ids,gamename);
+            });
+        }
+        else{
+            players[key] = player_ids[key];
+            key = key + 1;
+            get_runners_names(channel, user, category_name, time_run, playertype,key,player_count,player_uri,players,player_ids,gamename);
+        }
+    }
 }
 function dehash(channel) {
     return channel.replace(/^#/, '');
@@ -263,11 +286,58 @@ function handle_chat_commands(channel, user, message, self){
             break;
         }
         case "!comandos":{
-            client.action(channel, "Os comandos disponíveis são: !zera <arg> -> Quanto tempo pra zerar segundo Howlongtobeat; !falta <arg> -> Quantas horas "+dehash(channel)+" tem pra zerar antes da média do Howlongtobeat; !preço <arg> -> Verifica o preço de um jogo nas lojas; !histlow -> Procura o menor preço histórico de um jogo no IsThereAnyDeal; !source -> Diz onde está o código fonte do bot; !timer <arg> -> Cria um timer em segundos (máximo 10min); !comandos -> é esse comando.");
+            client.action(channel, "Os comandos disponíveis são: !zera <arg> -> Quanto tempo pra zerar segundo Howlongtobeat; !falta <arg> -> Quantas horas "+dehash(channel)+" tem pra zerar antes da média do Howlongtobeat; !preço <arg> -> Verifica o preço de um jogo nas lojas; !histlow -> Procura o menor preço histórico de um jogo no IsThereAnyDeal; !source -> Diz onde está o código fonte do bot; !timer <arg> -> Cria um timer em segundos (máximo 10min); !speedrun <game> -> Procura a speedrun na categoria principal, e reza pra ser o jogo certo e a categoria que você quer;!comandos -> é esse comando.");
             break;
         }
         case "!source":{
             client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/amarinBOT.");
+            break;
+        }
+        case "!speedrun":{
+
+            var req = unirest("GET", "https://www.speedrun.com/api/v1/games?name="+args+"&max=1");
+
+            req.end(function (res) {
+                if (res.error) {
+                    return;
+                }
+
+
+                if (Object.keys(res.body.data).length === 0){
+                    client.action(channel,"Não encontrei esse jogo no site Speedrun, verifique o nome e tente novamente. Ou desista.");
+                    return;
+                }
+                var gamename = res.body.data[0].names.international;
+                var game_run_id = res.body.data[0].links[5];
+                var req = unirest("GET", game_run_id.uri+"?miscellaneous=no&scope=full-game");
+
+                req.end(function (res) {
+                    if (res.error) {
+                        return;
+                    }
+
+                    game_runs = res.body.data[0];
+                    const time_run = game_runs.runs[0].run.times.primary.slice(2).toLowerCase();
+                    const category_name = game_runs.weblink.split('#').slice(1).join('_').replaceAll('_',' ');
+
+                    var player_count = Object.keys(game_runs.runs[0].run.players).length
+                    var players = new Array(player_count);
+                    var playertype = new Array(player_count);
+                    var player_uri = new Array(player_count);
+                    var player_ids = new Array(player_count);
+                    for(key in game_runs.runs[0].run.players){
+                        playertype[key] = game_runs.runs[0].run.players[key].rel;
+                        player_uri[key] = game_runs.runs[0].run.players[key].uri;
+                        player_ids[key] = game_runs.runs[0].run.players[key].id;
+                    }
+                    var key = 0;
+
+                    get_runners_names(channel, user, category_name, time_run, playertype,key,player_count,player_uri,players,player_ids,gamename);
+
+                });
+            });
+
+
             break;
         }
         default:{}

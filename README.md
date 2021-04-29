@@ -1,6 +1,6 @@
 # amarinBOT
 
-Chatbot da twitch que busca quanto tempo demora para zerar um jogo, quanto tempo o streamer ainda tem para zerar, preço de um jogo de PC nas lojas, seu menor preço registrado e um timer de até 10 mintos. 
+Chatbot da twitch que busca quanto tempo demora para zerar um jogo, quanto tempo o streamer ainda tem para zerar, preço de um jogo de PC nas lojas, seu menor preço registrado, um timer de até 10 mintos e procura também a speedrun de um jogo. 
 
 ## Pacotes necessários
 
@@ -16,6 +16,7 @@ Chatbot da twitch que busca quanto tempo demora para zerar um jogo, quanto tempo
 
     + API da Steam
     + API do IsThereAnyDeal
+    + API do Speedrun.com
 
 ## Instalando dependências e rodando
 
