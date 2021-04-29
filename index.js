@@ -29,7 +29,7 @@ function get_runners_names(channel, user, category_name, time_run, playertype,ke
     // Isso é completamente amaldiçoado, mas a api me forçou a fazer isso
     if(key >= player_count){
         players = players.join(' e ');
-        client.action(channel, user.username + " O jogo "+gamename+" na categoria principal (" + category_name + ") o record é de "+ time_run + " por " +players)
+        client.action(channel, user.username + " O jogo "+gamename+" na categoria principal (" + category_name + ") o recorde é de "+ time_run + " por " +players)
     }
     else{
         if(playertype[key] === 'user'){
