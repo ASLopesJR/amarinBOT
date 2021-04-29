@@ -267,7 +267,7 @@ function handle_chat_commands(channel, user, message, self){
             break;
         }
         case "!source":{
-            client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/twitchbot.");
+            client.action(channel, "O código fonte deste bot você encontra no github em ASLopesJR/amarinBOT.");
             break;
         }
         default:{}

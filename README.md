@@ -1,4 +1,4 @@
-# twitchbot
+# amarinBOT
 
 Chatbot da twitch que busca quanto tempo demora para zerar um jogo, quanto tempo o streamer ainda tem para zerar, preço de um jogo de PC nas lojas, seu menor preço registrado e um timer de até 10 mintos. 
 
@@ -20,8 +20,8 @@ Chatbot da twitch que busca quanto tempo demora para zerar um jogo, quanto tempo
 ## Instalando dependências e rodando
 
 ```console
-$ git clone https://github.com/aslopesjr/twitchbot
-$ cd twthbot
+$ git clone https://github.com/ASLopesJR/amarinBOT.git
+$ cd amarinBOT
 $ npm install
 $ node index.js
 ```
