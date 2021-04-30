@@ -150,14 +150,14 @@ function handle_chat_commands(channel, user, message, self){
                             return game.appid == value;
                         });
                         if(Object.keys(gameowned).length > 0){
-                            var horas = Math.round(gameowned.playtime_forever/60);
+                            var horas = Math.round(gameowned[0].playtime_forever/60);
                             var resta = result[0].gameplayMain - horas;
                             if(resta <= 0){
                                 resta = - resta;
                                 client.action(channel,"O " + channelname + " já jogou por " + horas + " horas e está atrasado " + resta + " horas pra zerar o " + result[0].name + ". Isso se ele não tá de sacanagem e já zerou.");
                             }
                             else{
-                                client.action(channel,"O " + channelname + " já jogou por " + horas + "horas e ainda tem " + resta + " horas pra zerar o " + result[0].name + ". Vai que dá!");
+                                client.action(channel,"O " + channelname + " já jogou por " + horas + " horas e ainda tem " + resta + " horas pra zerar o " + result[0].name + ". Vai que dá!");
                             }
                         }
                         else if(Object.keys(outrogameowned).length > 0){
