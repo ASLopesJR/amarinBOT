@@ -127,7 +127,7 @@ function handle_chat_commands(channel, user, message, self){
                     });
                     var searchresult = searcher.search(result[0].name.toLowerCase);
                     if (searchresult.length === 0){
-                        searchresult = searcher.search(args.toLowerCase);
+                        searchresult = searcher.search(args);
                         if (searchresult.length === 0){
                             client.action(channel, "Não achei o jogo na Steam.");
                             return;
