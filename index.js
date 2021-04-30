@@ -76,7 +76,7 @@ function handle_chat_commands(channel, user, message, self){
                     var mensagem = user.username +" Segundo IsThereAnyDeal -> ";
                     var pricelist =  res.body.data[nameitnd].list;
                     if (pricelist.length === 0){
-                        mensagem = user.username + "Seu jogo ainda vende em algum lugar?";
+                        mensagem = user.username + " seu jogo ainda vende em algum lugar?";
                     }
                     else{
                         for (var i = 0; i < pricelist.length; i++) {
@@ -125,10 +125,13 @@ function handle_chat_commands(channel, user, message, self){
                     const searcher = new FuzzySearch(cache.get('steamlist'), ['appid','name'], {
                         sort: true, caseSensitive: false,
                     });
-                    const searchresult = searcher.search(result[0].name);
+                    var searchresult = searcher.search(result[0].name.toLowerCase);
                     if (searchresult.length === 0){
-                        client.action(channel, "Não achei o jogo na Steam.");
-                        return;
+                        searchresult = searcher.search(args.toLowerCase);
+                        if (searchresult.length === 0){
+                            client.action(channel, "Não achei o jogo na Steam.");
+                            return;
+                        }
                     }
                     var value = searchresult[0].appid;
                     for (var i = 1; i < searchresult.length; i++) {
@@ -211,7 +214,7 @@ function handle_chat_commands(channel, user, message, self){
                     var mensagem = "";
                     var pricelist =  res.body.data[nameitnd];
                     if (pricelist.length === 0){
-                        mensagem = user.username + ", seu jogo ainda vende em algum lugar?";
+                        mensagem = user.username + " seu jogo ainda vende em algum lugar?";
                     }
                     else{
                         mensagem = user.username + ", Segundo IsThereAnyDeal, o menor preço foi R$" +pricelist.price+ " com "+pricelist.cut+"% de desconto em "+pricelist.shop.name+".";
