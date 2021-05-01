@@ -50,6 +50,69 @@ function get_runners_names(channel, user, category_name, time_run, playertype,ke
         }
     }
 }
+function getstoreprices(channel, user, search_list,idx){
+    if ((search_list.length < idx) || (search_list.length === 0)){
+        client.action(channel, user.username + " O nome do jogo está certo?");
+    }
+    else{
+        var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/prices/?key="+istheapi+"&plains="+ search_list[idx].plain +"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&added=0");
+        req.end(function (res) {
+            if (res.error) {
+                client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                return;
+            }
+            var mensagem = user.username +" Segundo IsThereAnyDeal, " + search_list[idx].title +" -> ";
+            var pricelist =  res.body.data[search_list[idx].plain].list;
+            if (pricelist.length === 0){
+                getstoreprices(channel,user,search_list,idx+1);
+            }
+            else{
+                for (var i = 0; i < pricelist.length; i++) {
+                    if( i === 0){
+                        if (pricelist[i].price_cut === 0){
+                            mensagem = mensagem + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new;
+                        }
+                        else{
+                            mensagem = mensagem + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new;
+                        }
+                    }
+                    else{
+                        if (pricelist[i].price_cut === 0){
+                            mensagem = mensagem + ", " + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new ;
+                        }
+                        else{
+                            mensagem = mensagem + ", " + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new ;
+                        }
+                    }
+                }
+                client.action(channel, mensagem);
+            }
+        });
+    }
+}
+function gethistlow(channel,user,search_list,idx){
+    if ((search_list < idx) || (search_list.length === 0)){
+            client.action(channel, user.username + " O nome do jogo está certo?");
+    }
+    else{
+        var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/lowest/?key="+istheapi+"&plains="+search_list[idx].plain+"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&since=0");
+        req.end(function (res) {
+            if (res.error) {
+                client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
+                return;
+            }
+            var mensagem = "";
+            var pricelist =  res.body.data[search_list[idx].plain];
+            if (pricelist.price.length === 0){
+                gethistlow(channel,user,search_list,idx+1);
+            }
+            else{
+                mensagem = user.username + ", Segundo IsThereAnyDeal, o menor preço de "+search_list[idx].title+" foi R$" +pricelist.price+ " com "+pricelist.cut+"% de desconto em "+pricelist.shop.name+".";
+            }
+            client.action(channel, mensagem);
+        });
+    }
+}
 function dehash(channel) {
     return channel.replace(/^#/, '');
 }
@@ -59,47 +122,16 @@ function handle_chat_commands(channel, user, message, self){
     var args    = sepmsg.slice(1).join(' ');
     switch(comando){
         case "!preço":{
-            let busca_preco = args;
-            var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+busca_preco+"&optional=");
+            const busca_preco = args;
+            var req = unirest("GET", "https://api.isthereanydeal.com/v02/search/search/?key="+istheapi+"&q="+busca_preco+"&limit=20&strict=0");
+
             req.end(function (res) {
                 if (res.error) {
                     client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                     return;
                 }
-                var nameitnd = res.body.data.plain;
-                var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/prices/?key="+istheapi+"&plains="+ nameitnd +"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&added=0");
-                req.end(function (res) {
-                    if (res.error) {
-                        client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
-                        return;
-                    }
-                    var mensagem = user.username +" Segundo IsThereAnyDeal -> ";
-                    var pricelist =  res.body.data[nameitnd].list;
-                    if (pricelist.length === 0){
-                        mensagem = user.username + " seu jogo ainda vende em algum lugar?";
-                    }
-                    else{
-                        for (var i = 0; i < pricelist.length; i++) {
-                            if( i === 0){
-                                if (pricelist[i].price_cut === 0){
-                                    mensagem = mensagem + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new;
-                                }
-                                else{
-                                    mensagem = mensagem + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new;
-                                }
-                            }
-                            else{
-                                if (pricelist[i].price_cut === 0){
-                                    mensagem = mensagem + ", " + pricelist[i].shop.name + ": sem desconto a R$" +pricelist[i].price_new ;
-                                }
-                                else{
-                                    mensagem = mensagem + ", " + pricelist[i].shop.name + ": " + pricelist[i].price_cut + "% de desconto a R$" +pricelist[i].price_new ;
-                                }
-                            }
-                        }
-                    }
-                    client.action(channel, mensagem);
-                });
+                var nameitnd = res.body.data.results;
+                getstoreprices(channel,user,nameitnd,0)
             });
             break;
         }
@@ -198,29 +230,15 @@ function handle_chat_commands(channel, user, message, self){
         }
         case "!histlow":{
             var busca_hist = args;
-            var req = unirest("GET", "https://api.isthereanydeal.com/v02/game/plain/?key="+istheapi+"&shop=&game_id=&url=&title="+busca_hist+"&optional=");
+            var req = unirest("GET", "https://api.isthereanydeal.com/v02/search/search/?key="+istheapi+"&q="+busca_hist+"&limit=20&strict=0");
             req.end(function (res) {
                 if (res.error) {
                     client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
                     return;
                 }
-                var nameitnd = res.body.data.plain;
-                var req = unirest("GET", "https://api.isthereanydeal.com/v01/game/lowest/?key="+istheapi+"&plains="+nameitnd+"&region=br2&country=BR&shops=steam%2Cnuuvem%2Cgog%2Cgreenmangaming%2Cbattlenet%2Cepic%2Cmicrosoft%2Corigin&exclude=&since=0");
-                req.end(function (res) {
-                    if (res.error) {
-                        client.action(channel, "AAAAAAAAAAAAH, erro de API. Tente de novo ou desista!");
-                        return;
-                    }
-                    var mensagem = "";
-                    var pricelist =  res.body.data[nameitnd];
-                    if (pricelist.length === 0){
-                        mensagem = user.username + " seu jogo ainda vende em algum lugar?";
-                    }
-                    else{
-                        mensagem = user.username + ", Segundo IsThereAnyDeal, o menor preço foi R$" +pricelist.price+ " com "+pricelist.cut+"% de desconto em "+pricelist.shop.name+".";
-                    }
-                    client.action(channel, mensagem);
-                });
+                var search_list = res.body.data.results;
+                gethistlow(channel,user,search_list,0);
+
             });
             break;
         }
@@ -289,7 +307,7 @@ function handle_chat_commands(channel, user, message, self){
 
 schedule.scheduleJob('0 0 * * *', () => {
     UpdateCache();
-}) // run everyday at midnight
+})
 
 let tmi_options = {
     options: {
